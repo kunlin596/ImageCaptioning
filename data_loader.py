@@ -43,7 +43,6 @@ def get_loader(
       vocab_from_file: If False, create vocab from scratch & override any existing vocab_file.
                        If True, load vocab from from existing vocab_file, if it exists.
       num_workers: Number of subprocesses to use for data loading
-      cocoapi_loc: The location of the folder containing the COCO API: https://github.com/cocodataset/cocoapi
     """
 
     assert mode in [
