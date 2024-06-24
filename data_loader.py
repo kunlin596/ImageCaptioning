@@ -46,32 +46,31 @@ def get_loader(
       cocoapi_loc: The location of the folder containing the COCO API: https://github.com/cocodataset/cocoapi
     """
 
-    assert mode in ["train", "test"], "mode must be one of 'train' or 'test'."
+    assert mode in [
+        "train",
+        "val",
+        "test",
+    ], "mode must be one of 'train' 'val', or 'test'!"
     if not vocab_from_file:
         assert (
             mode == "train"
         ), "To generate vocab from captions file, must be in training mode (mode='train')."
 
-    # Based on mode (train, val, test), obtain img_folder and annotations_file.
     if mode == "train":
         if vocab_from_file:
             assert os.path.exists(
                 vocab_file
             ), "vocab_file does not exist. Change vocab_from_file to False to create vocab_file!"
-        img_folder = data_dirpath / f"cocoapi/images/{mode}2014/"
-        annotations_file = data_dirpath / f"annotations/captions_{mode}2014.json"
     if mode == "test":
         assert batch_size == 1, "Please change batch_size to 1 if testing your model."
         assert os.path.exists(
             vocab_file
         ), "Must first generate vocab.pkl from training data."
         assert vocab_from_file, "Change vocab_from_file to True."
-        img_folder = data_dirpath / f"cocoapi/images/{mode}2014/"
-        annotations_file = (
-            data_dirpath / f"cocoapi/annotations/image_info_{mode}2014.json"
-        )
 
-    # COCO caption dataset.
+    image_dirpath = data_dirpath / f"images/{mode}2014/"
+    annotation_filepath = data_dirpath / f"annotations/image_info_{mode}2014.json"
+
     dataset = CoCoDataset(
         transform=transform,
         mode=mode,
@@ -81,9 +80,9 @@ def get_loader(
         start_word=start_word,
         end_word=end_word,
         unk_word=unk_word,
-        annotations_file=annotations_file,
+        annotations_file=annotation_filepath,
         vocab_from_file=vocab_from_file,
-        img_folder=img_folder,
+        img_folder=image_dirpath,
     )
 
     if mode == "train":
