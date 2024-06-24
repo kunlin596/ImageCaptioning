@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import os
+from pathlib import Path
 
 import nltk
 import numpy as np
@@ -15,6 +16,8 @@ from vocabulary import Vocabulary
 
 
 def get_loader(
+    *,
+    data_dirpath: Path,
     transform,
     mode="train",
     batch_size=1,
@@ -25,9 +28,9 @@ def get_loader(
     unk_word="<unk>",
     vocab_from_file=True,
     num_workers=0,
-    cocoapi_loc="/opt",
 ):
     """Returns the data loader.
+
     Args:
       transform: Image transform.
       mode: One of 'train' or 'test'.
@@ -54,20 +57,18 @@ def get_loader(
         if vocab_from_file:
             assert os.path.exists(
                 vocab_file
-            ), "vocab_file does not exist.  Change vocab_from_file to False to create vocab_file."
-        img_folder = os.path.join(cocoapi_loc, "cocoapi/images/train2014/")
-        annotations_file = os.path.join(
-            cocoapi_loc, "cocoapi/annotations/captions_train2014.json"
-        )
+            ), "vocab_file does not exist. Change vocab_from_file to False to create vocab_file!"
+        img_folder = data_dirpath / f"cocoapi/images/{mode}2014/"
+        annotations_file = data_dirpath / f"annotations/captions_{mode}2014.json"
     if mode == "test":
         assert batch_size == 1, "Please change batch_size to 1 if testing your model."
         assert os.path.exists(
             vocab_file
         ), "Must first generate vocab.pkl from training data."
         assert vocab_from_file, "Change vocab_from_file to True."
-        img_folder = os.path.join(cocoapi_loc, "cocoapi/images/test2014/")
-        annotations_file = os.path.join(
-            cocoapi_loc, "cocoapi/annotations/image_info_test2014.json"
+        img_folder = data_dirpath / f"cocoapi/images/{mode}2014/"
+        annotations_file = (
+            data_dirpath / f"cocoapi/annotations/image_info_{mode}2014.json"
         )
 
     # COCO caption dataset.
